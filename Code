@@ -1,0 +1,509 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <vector>
+#include <time.h>
+
+struct student {//структура студента
+	std::string fio;
+	int group;
+	int number;
+	char sex;
+	int mark[8];
+	std::string form;
+	tm change;
+};
+
+struct sport_stud {//доп задание
+	std::string fio;
+	char sex;
+	int age;
+	int size;
+	bool raz;
+	int kurs;
+};
+
+void print_s_stud(sport_stud chelik) {
+	std::cout << chelik.fio << '\n';
+	std::cout << chelik.sex << '\n';
+	std::cout << chelik.age << '\n';
+	switch (chelik.size) {
+	case 0:
+		std::cout << "S" << '\n';
+		break;
+	case 1:
+		std::cout << "M" << '\n';
+		break;
+	case 2:
+		std::cout << "L" << '\n';
+		break;
+	case 3:
+		std::cout << "XL" << '\n';
+		break;
+	case 4:
+		std::cout << "XXL" << '\n';
+		break;
+	default:
+		std::cout << "error" << '\n';
+		break;
+	}
+	if (chelik.raz) {
+		std::cout << "Есть разряд" << '\n';
+	}
+	else {
+		std::cout << "Нет разряда" << '\n';
+	}
+	std::cout << chelik.kurs << '\n' << '\n';
+}
+
+void print_stud(student chelik) {//вывод записи об одном челике
+	std::cout << chelik.fio << '\n';
+	std::cout << chelik.group << '\n';
+	std::cout << chelik.number << '\n';
+	std::cout << chelik.sex << '\n';
+	for (int j = 0; j != sizeof(chelik.mark) / sizeof(int); j++) {
+		std::cout << chelik.mark[j] << " ";
+	}
+	std::cout << '\n';
+	std::cout << chelik.form << '\n';
+	switch (chelik.change.tm_wday) {
+	case 0:
+		std::cout << "Sun ";
+		break;
+	case 1:
+		std::cout << "Mon ";
+		break;
+	case 2:
+		std::cout << "Tue ";
+		break;
+	case 3:
+		std::cout << "Wed ";
+		break;
+	case 4:
+		std::cout << "Thu ";
+		break;
+	case 5:
+		std::cout << "Fri ";
+		break;
+	case 6:
+		std::cout << "Sat ";
+		break;
+	default:
+		std::cout << "error ";
+		break;
+	}
+	std::cout << chelik.change.tm_mday << " ";
+	switch (chelik.change.tm_mon) {
+	case 0:
+		std::cout << "Jan ";
+		break;
+	case 1:
+		std::cout << "Feb ";
+		break;
+	case 2:
+		std::cout << "Mar ";
+		break;
+	case 3:
+		std::cout << "Apr ";
+		break;
+	case 4:
+		std::cout << "May ";
+		break;
+	case 5:
+		std::cout << "Jun ";
+		break;
+	case 6:
+		std::cout << "Jul ";
+		break;
+	case 7:
+		std::cout << "Aug ";
+		break;
+	case 8:
+		std::cout << "Sep ";
+		break;
+	case 9:
+		std::cout << "Oct ";
+		break;
+	case 10:
+		std::cout << "Nov ";
+		break;
+	case 11:
+		std::cout << "Sep ";
+		break;
+	default:
+		std::cout << "error ";
+		break;
+	}
+	std::cout << " " << chelik.change.tm_hour << ":" << chelik.change.tm_min << ":" << chelik.change.tm_sec << " " << chelik.change.tm_year + 1900 << '\n' << '\n';
+}
+
+student creat_new() {//Новая запись
+	student temp;
+	std::cout << "ФИО: " << '\n';
+	std::getline(std::cin, temp.fio);
+	std::getline(std::cin, temp.fio);
+	std::cout << "Group number: ";
+	std::cin >> temp.group;
+	std::cout << "Number in group: ";
+	std::cin >> temp.number;
+	std::cout << "Sex (M\\F): ";
+	std::cin >> temp.sex;
+	std::cout << "Learning form (day\\evening\\distance): ";
+	std::cin >> temp.form;
+	std::cout << "Marks (8 оценок от 0 до 5, через пробел): ";
+	for (int i = 0; i != sizeof(temp.mark) / sizeof(int); i++) {
+		std::cin >> temp.mark[i];
+	}
+	time_t sourseTime = time(NULL);
+	tm timeinfo;
+	localtime_s(&timeinfo, &sourseTime);
+	temp.change = timeinfo;
+	return temp;
+}
+
+void output(std::vector <student> spisok) {//Вывод всех записей
+	std::cout << size(spisok) << '\n';
+	for (int i = 0; i != size(spisok); i++) {
+		std::cout << i + 1 << ")  ";
+		print_stud(spisok[i]);
+	}
+}
+
+void output_group(std::vector <student> spisok) {//Вывод записей из определённой группы
+	int nomer;
+	std::cout << "Номер группы: ";
+	std::cin >> nomer;
+	for (int i = 0; i != size(spisok); i++) {
+		if (spisok[i].group == nomer) {
+			print_stud(spisok[i]);
+		}
+	}
+}
+
+float mid_mark(student chelik) {//Средняя оценка
+	double temp = 0;
+	for (int i = 0; i != 8; i++) {
+		temp += chelik.mark[i];
+	}
+	return temp;
+}
+
+void output_topMarks(std::vector <student> spisok) {//Вывод топа учеников
+	std::vector <student> temp(size(spisok));
+	for (int i = 0; i != size(spisok); i++) {
+		temp[i] = spisok[i];
+	}
+	for (int i = 0; i != size(spisok); i++) {
+		for (int j = 0; j != size(spisok) - i - 1; j++) {
+			if (mid_mark(temp[j]) < mid_mark(temp[j + 1])) {
+				std::swap(temp[j], temp[j + 1]);
+			}
+		}
+	}
+	output(temp);
+}
+
+void output_sex(std::vector <student> spisok) {//Вывод количества М\Ж
+	int M = 0, F = 0;
+	for (int i = 0; i != size(spisok); i++) {
+		if (spisok[i].sex == 'M') {
+			M++;
+		}
+		else {
+			F++;
+		}
+	}
+	std::cout << "Male: " << M << '\n' << "Female: " << F << '\n' << '\n';
+}
+
+void output_step(std::vector <student> spisok) {//Вывод количества людей, получающих стипендию
+	int sum = 0;
+	bool good = true;
+	for (int i = 0; i != size(spisok); i++) {
+		if (spisok[i].form == "day") {
+			for (int j = 0; j != sizeof(spisok[i].mark) / sizeof(int); j++) {
+				if (spisok[i].mark[j] <= 3) {
+					good = false;
+					break;
+				}
+			}
+			if (good) {
+				sum++;
+			}
+			else {
+				good = true;
+			}
+		}
+	}
+
+	std::cout << "Количество, получающих стипендию: " << sum << '\n';
+	std::cout << "Количество, оставшихся без стипендии: " << size(spisok) - sum << '\n' << '\n';
+}
+
+void output_fine(std::vector <student> spisok) {//вывод инфы об отличниках //доделать
+	bool fine = true;
+	int sum = 0;
+	std::cout << "Учатся только на отлично: " << '\n' << '\n';
+	for (int i = 0; i != size(spisok); i++) {
+		for (int j = 0; j != 8; j++) {
+			if (spisok[i].mark[j] != 5) {
+				fine = false;
+			}
+		}
+		if (fine) {
+			print_stud(spisok[i]);
+			std::swap(spisok[i], spisok[sum]);
+			sum++;
+		}
+		else {
+			fine = true;
+		}
+	}
+	std::cout << "Учатся только на хорошо: " << '\n' << '\n';
+	for (int i = sum; i != size(spisok); i++) {
+		for (int j = 0; j != 8; j++) {
+			if (spisok[i].mark[j] != 4) {
+				fine = false;
+			}
+		}
+		if (fine) {
+			print_stud(spisok[i]);
+			std::swap(spisok[i], spisok[sum]);
+			sum++;
+		}
+		else {
+			fine = true;
+		}
+	}
+	std::cout << "Учатся на хорошо и отлично: " << '\n' << '\n';
+	for (int i = sum; i != size(spisok); i++) {
+		for (int j = 0; j != 8; j++) {
+			if (spisok[i].mark[j] != 5 && spisok[i].mark[j] != 4) {
+				fine = false;
+			}
+		}
+		if (fine) {
+			print_stud(spisok[i]);
+			std::swap(spisok[i], spisok[sum]);
+			sum++;
+		}
+		else {
+			fine = true;
+		}
+	}
+}
+
+void output_number(std::vector <student> spisok) {//Вывод людей с определённым номером
+	int nomer;
+	std::cout << "Номер в списке группы: ";
+	std::cin >> nomer;
+	for (int i = 0; i != size(spisok); i++) {
+		if (spisok[i].number == nomer) {
+			print_stud(spisok[i]);
+		}
+	}
+}
+
+void output_in_day(std::vector <student> spisok) {//Вывод людей, с условиями по редактированию
+	int temp;
+	std::cout << "Число месяца: ";
+	std::cin >> temp;
+	std::cout << "До полудня: ";
+	for (int i = 0; i != size(spisok); i++) {
+		if (spisok[i].change.tm_mday == temp && spisok[i].change.tm_hour < 12) {
+			print_stud(spisok[i]);
+		}
+	}
+	std::cout << "После полудня: ";
+	for (int i = 0; i != size(spisok); i++) {
+		if (spisok[i].change.tm_mday == temp && spisok[i].change.tm_hour >= 12) {
+			print_stud(spisok[i]);
+		}
+	}
+}
+
+int main() {
+	setlocale(0, "");
+	std::string temp_s;
+	student temp_st;
+	sport_stud temp_ss;//доп задание
+	char temp_ch;
+	std::vector <student> spisok;
+	std::vector <sport_stud> s_spisok;//доп задание
+	std::ifstream file;
+	file.open("D:\\Projects\\Work_1\\StudentList.txt", std::ios::in);
+	if (!file.is_open()) {
+		std::cout << "File reading error" << '\n';
+		return 1;
+	}
+	else {
+		std::cout << "File is open" << '\n';
+	}
+	while (!file.eof()) {
+		spisok.push_back(temp_st);
+		std::getline(file, spisok[size(spisok) - 1].fio);
+		file >> spisok[size(spisok) - 1].group;
+		file >> spisok[size(spisok) - 1].number;
+		file >> spisok[size(spisok) - 1].sex;
+		for (int i = 0; i != 8; i++) {
+			file >> spisok[size(spisok) - 1].mark[i];
+		}
+		file >> spisok[size(spisok) - 1].form;
+		file >> spisok[size(spisok) - 1].change.tm_wday;
+		file >> spisok[size(spisok) - 1].change.tm_mday;
+		file >> spisok[size(spisok) - 1].change.tm_mon;
+		file >> spisok[size(spisok) - 1].change.tm_hour;
+		file >> temp_ch;
+		file >> spisok[size(spisok) - 1].change.tm_min;
+		file >> temp_ch;
+		file >> spisok[size(spisok) - 1].change.tm_sec;
+		file >> spisok[size(spisok) - 1].change.tm_year;
+		std::getline(file, temp_s);
+	}
+	file.close();//закончили чтение из файла
+
+	int choice = 1, temp_int;
+	while (choice) {
+		std::cout << "1) Создние новой записи" << '\n';
+		std::cout << "2) Внесение изминений в запись" << '\n';
+		std::cout << "3) Вывод списка" << '\n';
+		std::cout << "4) Вывод списка сдудентов n-ой группы" << '\n';
+		std::cout << "5) Вывод топа" << '\n';
+		std::cout << "6) Вывод количества м\\ж" << '\n';
+		std::cout << "7) Вывод количества, получающих\\не получающих стипендию" << '\n';
+		std::cout << "8) Учатся на \"отлично\"\\\"хорошо\"" << '\n';
+		std::cout << "9) Вывод студентов n-х по списку" << '\n';
+		std::cout << "10) Записи, сделанные в n-й день" << '\n';
+		std::cout << "11) Очистить консоль" << '\n';
+		std::cout << "12) Сохранить список" << '\n';
+		std::cout << "0) Выход" << '\n';
+		std::cin >> choice;
+		switch (choice) {
+		case 1:
+			spisok.push_back(creat_new());
+			break;
+		case 2:
+			std::cout << "Номер редактируемой записи( от 1 до " << size(spisok) << "): ";
+			std::cin >> temp_int;
+			temp_int--;
+			spisok[temp_int] = creat_new();
+			break;
+		case 3:
+			output(spisok);
+			break;
+		case 4:
+			output_group(spisok);
+			break;
+		case 5:
+			output_topMarks(spisok);
+			break;
+		case 6:
+			output_sex(spisok);
+			break;
+		case 7:
+			output_step(spisok);
+			break;
+		case 8:
+			output_fine(spisok);
+			break;
+		case 9:
+			output_number(spisok);
+			break;
+		case 10:
+			output_in_day(spisok);
+			break;
+		case 11:
+			system("cls");
+			break;
+		case 12://Удаление старого, создание нового;
+			
+			break;
+		case 0:
+			choice = 0;
+			break;
+		}
+	}
+	remove("D:\\Projects\\Work_1\\StudentList.txt");
+	std::ofstream out("D:\\Projects\\Work_1\\StudentList.txt");
+	out << spisok[0].fio << '\n';
+	out << spisok[0].group << '\n';
+	out << spisok[0].number << '\n';
+	out << spisok[0].sex << '\n';
+	for (int j = 0; j != sizeof(spisok[0].mark) / sizeof(int); j++) {
+		out << spisok[0].mark[j] << " ";
+	}
+	out << '\n';
+	out << spisok[0].form << '\n';
+	out << spisok[0].change.tm_wday << " " << spisok[0].change.tm_mday << " " << spisok[0].change.tm_mon << " " << spisok[0].change.tm_hour << ":" << spisok[0].change.tm_min << ":" << spisok[0].change.tm_sec << " " << spisok[0].change.tm_year;
+	for (int i = 1; i != size(spisok); i++) {
+		out << '\n';
+		out << spisok[i].fio << '\n';
+		out << spisok[i].group << '\n';
+		out << spisok[i].number << '\n';
+		out << spisok[i].sex << '\n';
+		for (int j = 0; j != sizeof(spisok[i].mark) / sizeof(int); j++) {
+			out << spisok[i].mark[j] << " ";
+		}
+		out << '\n';
+		out << spisok[i].form << '\n';
+		out << spisok[i].change.tm_wday << " " << spisok[i].change.tm_mday << " " << spisok[i].change.tm_mon << " " << spisok[i].change.tm_hour << ":" << spisok[i].change.tm_min << ":" << spisok[i].change.tm_sec << " " << spisok[i].change.tm_year;
+	}
+	spisok.clear();
+	//Доп задание
+	file.open("D:\\Projects\\Work_1\\SportStudentList.txt", std::ios::in);
+	if (!file.is_open()) {
+		std::cout << "File reading error" << '\n';
+		return 1;
+	}
+	else {
+		std::cout << "File is open" << '\n';
+	}
+	while (!file.eof()) {
+		s_spisok.push_back(temp_ss);
+		std::getline(file, s_spisok[size(s_spisok) - 1].fio);
+		file >> s_spisok[size(s_spisok) - 1].sex;
+		file >> s_spisok[size(s_spisok) - 1].age;
+		file >> s_spisok[size(s_spisok) - 1].size;
+		file >> s_spisok[size(s_spisok) - 1].raz;
+		file >> s_spisok[size(s_spisok) - 1].kurs;
+		print_s_stud(s_spisok[size(s_spisok) - 1]);
+		std::getline(file, temp_s);
+	}
+	std::cout << "Люди имеющие спортивный разряд:" << '\n';
+	for (int i = 0; i != size(s_spisok); i++) {
+		if (s_spisok[i].raz) {
+			print_s_stud(s_spisok[i]);
+		}
+	}
+	std::cout << "Женская сборная:" << '\n';
+	for (int i = 0; i != size(s_spisok); i++) {
+		if (s_spisok[i].sex == 'F') {
+			print_s_stud(s_spisok[i]);
+		}
+	}
+	std::cout << "Мужская сборная:" << '\n';
+	for (int i = 0; i != size(s_spisok); i++) {
+		if (s_spisok[i].sex == 'M') {
+			print_s_stud(s_spisok[i]);
+		}
+	}
+	std::cout << "Номер интерисующего курса: ";
+	std::cin >> temp_int;
+	if (temp_int > 0 && temp_int < 7) {
+		for (int i = 0; i != size(s_spisok); i++) {
+			if (s_spisok[i].kurs == temp_int) {
+				print_s_stud(s_spisok[i]);
+			}
+		}
+	}
+	else {
+		std::cout << "нет такого курса" << '\n' << '\n';
+	}
+	std::cout << "Парни, чей размер одежды больше S:" << '\n';
+	for (int i = 0; i != size(s_spisok); i++) {
+		if (s_spisok[i].size > 0 && s_spisok[i].sex == 'M') {
+			print_s_stud(s_spisok[i]);
+		}
+	}
+	return 0;
+}
